@@ -32,17 +32,18 @@ class AccountServiceImpl (private val accountRepository: AccountRepository): Acc
 
     override fun update(id: Long, account: Account): Optional<Account> {
         val optional =  getById(id)
-        if(optional.isEmpty){
-            return optional
+        if(optional.isPresent){
+            return optional.map {
+                val accountToUpdate = it.copy(
+                    name = account.name,
+                    document = account.document,
+                    phone = account.phone
+                )
+                accountRepository.save(accountToUpdate)
+            }
+
         }
-        return optional.map {
-            val accountToUpdate = it.copy(
-                name = account.name,
-                document = account.document,
-                phone = account.phone
-            )
-            accountRepository.save(accountToUpdate)
-        }
+        return optional
     }
 
     override fun delete(id: Long) {
